@@ -12,5 +12,9 @@
 *.vsix
 
 build/*
+deploy/*
+systemd/*
+create_deb_package.sh
+DEBIAN/*
 
 lib/*

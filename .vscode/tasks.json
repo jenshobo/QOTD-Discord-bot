@@ -58,6 +58,18 @@
         "kind": "build",
         "isDefault": true
       }
+    },
+    {
+      "label": "create-deb-package",
+      "type": "shell",
+      "command": "${workspaceFolder}/create_deb_package.sh",
+      "args": ["${workspaceFolder}"],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": [],
+      "detail": "Create .deb package"
     }
   ]
 }
