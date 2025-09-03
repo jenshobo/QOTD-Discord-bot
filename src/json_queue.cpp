@@ -11,6 +11,8 @@ void save_queue(const std::queue<std::string>& q, const std::string& filename) {
     }
 
     j["offset"] = get_offset(filename);
+    j["discord-bot-token"] = get_token(filename);
+    j["qoft-channel-id"] = static_cast<uint64_t>(get_channel(filename));
 
     std::ofstream file(filename);
     file << j.dump(4);
@@ -63,7 +65,35 @@ void increment_offset(const std::string& filename) {
     offset = static_cast<uint16_t>((offset + 1) % 65536); // ~ 170 years from 2025, by then hardware should be good enough for at least 32 bit
 
     j["offset"] = offset;
+    j["discord-bot-token"] = get_token(filename);
+    j["qoft-channel-id"] = static_cast<uint64_t>(get_channel(filename));
 
     std::ofstream output_file(filename);
     output_file << j.dump(4);
+}
+
+std::string get_token(const std::string& filename) {
+    std::ifstream file(filename);
+    nlohmann::json j;
+
+    if (file >> j) {
+        if (j.contains("discord-bot-token") && j["discord-bot-token"].is_string()) {
+            return j["discord-bot-token"];
+        }
+    }
+
+    return "";
+}
+
+dpp::snowflake get_channel(const std::string& filename) {
+    std::ifstream file(filename);
+    nlohmann::json j;
+
+    if (file >> j) {
+        if (j.contains("qoft-channel-id") && j["qoft-channel-id"].is_number_integer()) {
+            return static_cast<dpp::snowflake>(j["qoft-channel-id"].get<uint64_t>());
+        }
+    }
+
+    return 0;
 }

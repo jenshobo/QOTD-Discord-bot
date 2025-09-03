@@ -1,7 +1,7 @@
 #include "main.h"
 
 int main() {
-    dpp::cluster bot(DISCORD_BOT_TOKEN);
+    dpp::cluster bot(get_token(QUEUE_FILE_NAME));
 	 
     bot.on_log(dpp::utility::cout_logger());
  

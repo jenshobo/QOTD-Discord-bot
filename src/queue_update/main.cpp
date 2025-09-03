@@ -1,14 +1,15 @@
 #include "main.h"
 
 int main(void) {
-    dpp::cluster bot(DISCORD_BOT_TOKEN);
+    dpp::cluster bot(get_token(QUEUE_FILE_NAME));
 
     bot.on_log(dpp::utility::cout_logger());
 
     bot.on_ready([&bot](const dpp::ready_t& event) {
         std::string question = get_question();
+        std::cout << get_channel(QUEUE_FILE_NAME) << std::endl;
 
-        bot.message_create(dpp::message(DISCORD_CHANNEL_ID, question),
+        bot.message_create(dpp::message(get_channel(QUEUE_FILE_NAME), question),
             [&bot](const dpp::confirmation_callback_t& callback) {
                 if (!callback.is_error()) {
                     std::cout << "Question sent successfully" << std::endl;

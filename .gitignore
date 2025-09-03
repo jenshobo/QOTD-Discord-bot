@@ -12,8 +12,5 @@
 *.vsix
 
 build/*
-!build/QOTD_queue.json
-
-hdr/credentials.h
 
 lib/*
