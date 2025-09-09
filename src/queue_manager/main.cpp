@@ -46,7 +46,7 @@ int main() {
         }
 
         if (event.command.get_command_name() == "remove") {
-            uint16_t index_input = static_cast<uint16_t>(std::get<int64_t>(event.get_parameter("index")));
+            uint64_t index_input = std::get<int64_t>(event.get_parameter("index"));
             std::stringstream ss;
             ss << "Removing question " << index_input << " from queue";
             event.reply(ss.str());

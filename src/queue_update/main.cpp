@@ -7,7 +7,6 @@ int main(void) {
 
     bot.on_ready([&bot](const dpp::ready_t& event) {
         std::string question = get_question();
-        std::cout << get_channel(QUEUE_FILE_NAME) << std::endl;
 
         bot.message_create(dpp::message(get_channel(QUEUE_FILE_NAME), question),
             [&bot](const dpp::confirmation_callback_t& callback) {

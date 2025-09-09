@@ -4,13 +4,13 @@ void write_queue(
     const std::string& filename,
     std::optional<std::string> default_val = std::nullopt,
     std::optional<std::string> bot_token = std::nullopt,
-    std::optional<uint16_t> offset = std::nullopt,
+    std::optional<uint64_t> offset = std::nullopt,
     std::optional<dpp::snowflake> channel_id = std::nullopt,
     std::optional<std::queue<std::string>> queue = std::nullopt
 ) {
     std::string default_field = default_val.value_or(get_default(filename));
     std::string token_field = bot_token.value_or(get_token(filename));
-    uint16_t offset_field = offset.value_or(get_offset(filename));
+    uint64_t offset_field = offset.value_or(get_offset(filename));
     dpp::snowflake channel_field = channel_id.value_or(get_channel(filename));
     std::queue<std::string> queue_field = queue.value_or(load_queue(filename));
 
@@ -53,14 +53,14 @@ std::queue<std::string> load_queue(const std::string& filename) {
     return q;
 }
 
-uint16_t get_offset(const std::string& filename) {
+uint64_t get_offset(const std::string& filename) {
     std::ifstream file(filename);
     nlohmann::json j;
 
     std::string fieldName = "offset";
     if (file >> j) {
         if (j.contains(fieldName) && j[fieldName].is_number_unsigned()) {
-            return static_cast<uint16_t>(j[fieldName]);
+            return static_cast<uint64_t>(j[fieldName]);
         }
     }
 
@@ -71,15 +71,18 @@ void increment_offset(const std::string& filename) {
     std::ifstream file(filename);
     nlohmann::json j;
 
-    uint16_t offset = 0;
+    uint64_t offset = 0;
     std::string fieldName = "offset";
     if (file >> j) {
         if (j.contains(fieldName) && j[fieldName].is_number_unsigned()) {
-            offset = static_cast<uint16_t>(j[fieldName]);
+            offset = static_cast<uint64_t>(j[fieldName]);
         }
     }
 
-    offset = static_cast<uint16_t>((offset + 1) % 65536); // ~ 170 years from 2025, by then hardware should be good enough for at least 32 bit
+    offset = static_cast<uint64_t>((offset + 1) % 0xFFFFFFFFFFFFFFFF); 
+    // ~ 50498110278627 years from now, 
+    // I do believe that would cover the total length of time the student association will be around, 
+    // considering the sun goes a little earlier...
 
     write_queue(filename, std::nullopt, std::nullopt, offset);
 }
