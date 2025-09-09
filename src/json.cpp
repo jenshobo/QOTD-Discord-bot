@@ -78,8 +78,8 @@ void increment_offset(const std::string& filename) {
             offset = static_cast<uint64_t>(j[fieldName]);
         }
     }
-
-    offset = static_cast<uint64_t>((offset + 1) % 0xFFFFFFFFFFFFFFFF); 
+    
+    offset++; // max 0xFFFFFFFFFFFFFFFF
     // ~ 50498110278627 years from now, 
     // I do believe that would cover the total length of time the student association will be around, 
     // considering the sun goes a little earlier...
