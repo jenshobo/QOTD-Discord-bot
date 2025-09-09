@@ -1,22 +1,39 @@
-#include "json_queue.h"
+#include "json.h"
 
-void save_queue(const std::queue<std::string>& q, const std::string& filename) {
-    std::queue<std::string> temp = q;
-    nlohmann::json j;
-    j["queue"] = nlohmann::json::array();
+void write_queue(
+    const std::string& filename,
+    std::optional<std::string> default_val = std::nullopt,
+    std::optional<std::string> bot_token = std::nullopt,
+    std::optional<uint16_t> offset = std::nullopt,
+    std::optional<dpp::snowflake> channel_id = std::nullopt,
+    std::optional<std::queue<std::string>> queue = std::nullopt
+) {
+    std::string default_field = default_val.value_or(get_default(filename));
+    std::string token_field = bot_token.value_or(get_token(filename));
+    uint16_t offset_field = offset.value_or(get_offset(filename));
+    dpp::snowflake channel_field = channel_id.value_or(get_channel(filename));
+    std::queue<std::string> queue_field = queue.value_or(load_queue(filename));
 
-    while (!temp.empty()) {
-        j["queue"].push_back(temp.front());
-        temp.pop();
+    std::vector<std::string> queue_vec;
+    std::queue<std::string> temp_queue = queue_field;
+    while (!temp_queue.empty()) {
+        queue_vec.push_back(temp_queue.front());
+        temp_queue.pop();
     }
 
-    j["offset"] = get_offset(filename);
-    j["discord-bot-token"] = get_token(filename);
-    j["default"] = get_default(filename);
-    j["qoft-channel-id"] = static_cast<uint64_t>(get_channel(filename));
+    nlohmann::json j;
+    j["default"] = default_field;
+    j["discord-bot-token"] = token_field;
+    j["offset"] = offset_field;
+    j["qotd-channel-id"] = static_cast<uint64_t>(channel_field);
+    j["queue"] = queue_vec;
 
     std::ofstream file(filename);
-    file << j.dump(4);
+    file <<j.dump(4);
+}
+
+void save_queue(const std::queue<std::string>& queue, const std::string& filename) {
+    write_queue(filename, std::nullopt, std::nullopt, std::nullopt, std::nullopt, queue);
 }
 
 std::queue<std::string> load_queue(const std::string& filename) {
@@ -51,31 +68,20 @@ uint16_t get_offset(const std::string& filename) {
 }
 
 void increment_offset(const std::string& filename) {
-    std::ifstream input_file(filename);
+    std::ifstream file(filename);
     nlohmann::json j;
 
-    std::string fieldName = "offset";
-
-    if (!(input_file >> j)) {
-        j["queue"] = nlohmann::json::array();
-        j[fieldName] = 0;
-    }
-    input_file.close();
-
     uint16_t offset = 0;
-    if (j.contains(fieldName) && j[fieldName].is_number_unsigned()) {
-        offset = static_cast<uint16_t>(j[fieldName]);
+    std::string fieldName = "offset";
+    if (file >> j) {
+        if (j.contains(fieldName) && j[fieldName].is_number_unsigned()) {
+            offset = static_cast<uint16_t>(j[fieldName]);
+        }
     }
 
     offset = static_cast<uint16_t>((offset + 1) % 65536); // ~ 170 years from 2025, by then hardware should be good enough for at least 32 bit
 
-    j[fieldName] = offset;
-    j["discord-bot-token"] = get_token(filename);
-    j["default"] = get_default(filename);
-    j["qoft-channel-id"] = static_cast<uint64_t>(get_channel(filename));
-
-    std::ofstream output_file(filename);
-    output_file << j.dump(4);
+    write_queue(filename, std::nullopt, std::nullopt, offset);
 }
 
 std::string get_token(const std::string& filename) {
@@ -96,7 +102,7 @@ dpp::snowflake get_channel(const std::string& filename) {
     std::ifstream file(filename);
     nlohmann::json j;
 
-    std::string fieldName = "qoft-channel-id";
+    std::string fieldName = "qotd-channel-id";
     if (file >> j) {
         if (j.contains(fieldName) && j[fieldName].is_number_integer()) {
             return static_cast<dpp::snowflake>(j[fieldName].get<uint64_t>());

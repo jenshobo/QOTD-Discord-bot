@@ -11,13 +11,13 @@ int main() {
             ss
             << "You can add and remove questions to the QOTD (Question Of The Day) queue using the following commands" << std::endl
             << "```" << std::endl
-            << "+---------+-----------------------------------------------+" << std::endl
-            << "|/add     | Add a question to the back of the queue       |" << std::endl
-            << "|/addprio | Add a question to the front of the queue      |" << std::endl
-            << "|/remove  | Remove a question BY INDEX                    |" << std::endl
-            << "|/list    | List the current queue with index             |" << std::endl
-            << "|/help    | You just used this command, don't be dumb now |" << std::endl
-            << "+---------+-----------------------------------------------+" << std::endl
+            << "+----------+-----------------------------------------------+" << std::endl
+            << "| /add     | Add a question to the back of the queue       |" << std::endl
+            << "| /addprio | Add a question to the front of the queue      |" << std::endl
+            << "| /remove  | Remove a question BY INDEX                    |" << std::endl
+            << "| /list    | List the current queue with index             |" << std::endl
+            << "| /help    | You just used this command, don't be dumb now |" << std::endl
+            << "+----------+-----------------------------------------------+" << std::endl
             << "```" << std::endl
             << "The question at the front of the queue will automatically be posted to the QOTD channel and removed from the queue every day at 12:00." << std::endl
             << "Please make sure the queue is alway filled with items." << std::endl

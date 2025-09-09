@@ -1,5 +1,5 @@
-#ifndef JSON_QUEUE_H
-#define JSON_QUEUE_H
+#ifndef JSON_H
+#define JSON_H
 
 #include <iostream>
 #include <fstream>
