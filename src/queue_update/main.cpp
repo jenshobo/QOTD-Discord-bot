@@ -29,15 +29,16 @@ int main(void) {
 std::string get_question(void) {
     auto queue = load_queue(QUEUE_FILE_NAME);
 
-    if (queue.empty()) {
-        std::cerr << "Queue is empty, cannot get next question." << std::endl;
+    std::stringstream ss;
+    if (!queue.empty()) {
+        ss << "[" << get_offset(QUEUE_FILE_NAME) << "]. " << queue.front();
+        queue.pop();
+    }
+    else {
+        ss << "[" << get_offset(QUEUE_FILE_NAME) << "]. " << get_default(QUEUE_FILE_NAME);
     }
 
-    std::stringstream ss;
-    ss << "[" << get_offset(QUEUE_FILE_NAME) << "]. " << queue.front();
     increment_offset(QUEUE_FILE_NAME);
-    queue.pop();
-
     save_queue(queue, QUEUE_FILE_NAME);
 
     return ss.str();

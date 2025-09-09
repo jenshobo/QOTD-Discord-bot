@@ -12,6 +12,7 @@ void save_queue(const std::queue<std::string>& q, const std::string& filename) {
 
     j["offset"] = get_offset(filename);
     j["discord-bot-token"] = get_token(filename);
+    j["default"] = get_default(filename);
     j["qoft-channel-id"] = static_cast<uint64_t>(get_channel(filename));
 
     std::ofstream file(filename);
@@ -23,9 +24,10 @@ std::queue<std::string> load_queue(const std::string& filename) {
     nlohmann::json j;
     std::queue<std::string> q;
 
+    std::string fieldName = "queue";
     if (file >> j) {
-        if (j.contains("queue") && j["queue"].is_array()) {
-            for (const auto& item : j["queue"]) {
+        if (j.contains(fieldName) && j[fieldName].is_array()) {
+            for (const auto& item : j[fieldName]) {
                 q.push(item.get<std::string>());
             }
         }
@@ -38,9 +40,10 @@ uint16_t get_offset(const std::string& filename) {
     std::ifstream file(filename);
     nlohmann::json j;
 
+    std::string fieldName = "offset";
     if (file >> j) {
-        if (j.contains("offset") && j["offset"].is_number_unsigned()) {
-            return static_cast<uint16_t>(j["offset"]);
+        if (j.contains(fieldName) && j[fieldName].is_number_unsigned()) {
+            return static_cast<uint16_t>(j[fieldName]);
         }
     }
 
@@ -51,21 +54,24 @@ void increment_offset(const std::string& filename) {
     std::ifstream input_file(filename);
     nlohmann::json j;
 
+    std::string fieldName = "offset";
+
     if (!(input_file >> j)) {
         j["queue"] = nlohmann::json::array();
-        j["offset"] = 0;
+        j[fieldName] = 0;
     }
     input_file.close();
 
     uint16_t offset = 0;
-    if (j.contains("offset") && j["offset"].is_number_unsigned()) {
-        offset = static_cast<uint16_t>(j["offset"]);
+    if (j.contains(fieldName) && j[fieldName].is_number_unsigned()) {
+        offset = static_cast<uint16_t>(j[fieldName]);
     }
 
     offset = static_cast<uint16_t>((offset + 1) % 65536); // ~ 170 years from 2025, by then hardware should be good enough for at least 32 bit
 
-    j["offset"] = offset;
+    j[fieldName] = offset;
     j["discord-bot-token"] = get_token(filename);
+    j["default"] = get_default(filename);
     j["qoft-channel-id"] = static_cast<uint64_t>(get_channel(filename));
 
     std::ofstream output_file(filename);
@@ -76,9 +82,10 @@ std::string get_token(const std::string& filename) {
     std::ifstream file(filename);
     nlohmann::json j;
 
+    std::string fieldName = "discord-bot-token";
     if (file >> j) {
-        if (j.contains("discord-bot-token") && j["discord-bot-token"].is_string()) {
-            return j["discord-bot-token"];
+        if (j.contains(fieldName) && j[fieldName].is_string()) {
+            return j[fieldName];
         }
     }
 
@@ -89,11 +96,26 @@ dpp::snowflake get_channel(const std::string& filename) {
     std::ifstream file(filename);
     nlohmann::json j;
 
+    std::string fieldName = "qoft-channel-id";
     if (file >> j) {
-        if (j.contains("qoft-channel-id") && j["qoft-channel-id"].is_number_integer()) {
-            return static_cast<dpp::snowflake>(j["qoft-channel-id"].get<uint64_t>());
+        if (j.contains(fieldName) && j[fieldName].is_number_integer()) {
+            return static_cast<dpp::snowflake>(j[fieldName].get<uint64_t>());
         }
     }
 
     return 0;
+}
+
+std::string get_default(const std::string& filename) {
+    std::ifstream file(filename);
+    nlohmann::json j;
+
+    std::string fieldName = "default";
+    if (file >> j) {
+        if (j.contains(fieldName) && j[fieldName].is_string()) {
+            return j[fieldName];
+        }
+    }
+
+    return "";
 }
