@@ -11,13 +11,13 @@ int main() {
             ss
             << "You can add and remove questions to the QOTD (Question Of The Day) queue using the following commands" << std::endl
             << "```" << std::endl
-            << "+---------+-----------------------------------------------+" << std::endl
-            << "|/add     | Add a question to the back of the queue       |" << std::endl
-            << "|/addprio | Add a question to the front of the queue      |" << std::endl
-            << "|/remove  | Remove a question BY INDEX                    |" << std::endl
-            << "|/list    | List the current queue with index             |" << std::endl
-            << "|/help    | You just used this command, don't be dumb now |" << std::endl
-            << "+---------+-----------------------------------------------+" << std::endl
+            << "+----------+-----------------------------------------------+" << std::endl
+            << "| /add     | Add a question to the back of the queue       |" << std::endl
+            << "| /addprio | Add a question to the back of the prioqueue   |" << std::endl
+            << "| /remove  | Remove a question BY INDEX                    |" << std::endl
+            << "| /list    | List the current queue with index             |" << std::endl
+            << "| /help    | You just used this command, don't be dumb now |" << std::endl
+            << "+----------+-----------------------------------------------+" << std::endl
             << "```" << std::endl
             << "The question at the front of the queue will automatically be posted to the QOTD channel and removed from the queue every day at 12:00." << std::endl
             << "Please make sure the queue is alway filled with items." << std::endl
@@ -39,14 +39,14 @@ int main() {
         if (event.command.get_command_name() == "addprio") {
             std::string question_input = std::get<std::string>(event.get_parameter("question"));
             std::stringstream ss;
-            ss << "Adding " << question_input << " to the front of the queue.";
+            ss << "Adding " << question_input << " to the priority queue";
             event.reply(ss.str());
 
             add_to_queue_priority(question_input);
         }
 
         if (event.command.get_command_name() == "remove") {
-            uint16_t index_input = static_cast<uint16_t>(std::get<int64_t>(event.get_parameter("index")));
+            uint64_t index_input = std::get<int64_t>(event.get_parameter("index"));
             std::stringstream ss;
             ss << "Removing question " << index_input << " from queue";
             event.reply(ss.str());
@@ -55,20 +55,18 @@ int main() {
         }
 
         if (event.command.get_command_name() == "list") {
-            std::stringstream ss;
-
+            auto prioqueue = load_prioqueue(QUEUE_FILE_NAME);
             auto queue = load_queue(QUEUE_FILE_NAME);
             uint16_t offset = get_offset(QUEUE_FILE_NAME);
 
-            if (queue.empty()) {
+            if (prioqueue.empty() && queue.empty()) {
                 event.reply("Queue is empty.");
             }
             else {
-                while (!queue.empty()) {
-                    ss << "[" << offset << "]. " << queue.front() << std::endl;
-                    queue.pop();
-                    offset++;
-                }
+                std::stringstream ss;
+                std::stringstream ss_prioqueue = queue_tostring(offset, prioqueue);
+                std::stringstream ss_queue = queue_tostring(offset, queue);
+                ss << ss_prioqueue.str() << ss_queue.str();
 
                 event.reply(ss.str());
             }
@@ -78,12 +76,12 @@ int main() {
     bot.on_ready([&bot](const dpp::ready_t& event) {
         if (dpp::run_once<struct register_bot_commands>()) {
             bot.global_command_create(dpp::slashcommand("help", "I can't help you with stupidity", bot.me.id));
-            bot.global_command_create(dpp::slashcommand("add", "Add question to the QOTD queue", bot.me.id)
+            bot.global_command_create(dpp::slashcommand("add", "Add question to the back of the queue", bot.me.id)
                 .add_option(
                     dpp::command_option(dpp::co_string, "question", "The question to add", true)
                 )
             );
-            bot.global_command_create(dpp::slashcommand("addprio", "Add priority question to the front of the QOTD queue", bot.me.id)
+            bot.global_command_create(dpp::slashcommand("addprio", "Add priority question to the back of the priority queue", bot.me.id)
                 .add_option(
                     dpp::command_option(dpp::co_string, "question", "The priority question to add", true)
                 )
@@ -100,41 +98,56 @@ int main() {
     bot.start(dpp::st_wait);
 }
 
+std::stringstream queue_tostring(uint16_t& offset, std::queue<std::string>& queue) {
+    std::stringstream ss;
+    while (!queue.empty()) {
+        ss << "[" << offset << "]. " << queue.front() << std::endl;
+        queue.pop();
+        offset++;
+    }
+    return ss;
+}
+
 void add_to_queue(std::string& question) {
+    auto prioqueue = load_prioqueue(QUEUE_FILE_NAME);
     auto queue = load_queue(QUEUE_FILE_NAME);
 
     queue.push(question);
 
-    save_queue(queue, QUEUE_FILE_NAME);
+    save_queue(prioqueue, queue, QUEUE_FILE_NAME);
 }
 
 void add_to_queue_priority(std::string& question) {
+    auto prioqueue = load_prioqueue(QUEUE_FILE_NAME);
     auto queue = load_queue(QUEUE_FILE_NAME);
 
-    std::queue<std::string> newQueue;
-    newQueue.push(question);
+    prioqueue.push(question);
 
-    while (!queue.empty()) {
-        newQueue.push(queue.front());
-        queue.pop();
-    }
-
-    save_queue(newQueue, QUEUE_FILE_NAME);
+    save_queue(prioqueue, queue, QUEUE_FILE_NAME);
 }
 
-void remove_from_queue(uint16_t index)
-{
+void remove_from_queue(uint16_t index) {
+    auto prioqueue = load_prioqueue(QUEUE_FILE_NAME);
     auto queue = load_queue(QUEUE_FILE_NAME);
     uint16_t offset = get_offset(QUEUE_FILE_NAME);
 
-    std::queue<std::string> newQueue;
+    std::queue<std::string> new_prioqueue;
+    while (!prioqueue.empty()) {
+        if (offset != index) {
+            new_prioqueue.push(prioqueue.front());
+        }
+        prioqueue.pop();
+        offset++;
+    }
+
+    std::queue<std::string> new_queue;
     while (!queue.empty()) {
         if (offset != index) {
-            newQueue.push(queue.front());
+            new_queue.push(queue.front());
         }
         queue.pop();
         offset++;
     }
 
-    save_queue(newQueue, QUEUE_FILE_NAME);
+    save_queue(new_prioqueue, new_queue, QUEUE_FILE_NAME);
 }
