@@ -26,10 +26,15 @@ int main(void) {
 }
 
 std::string get_question(void) {
+    auto prioqueue = load_prioqueue(QUEUE_FILE_NAME);
     auto queue = load_queue(QUEUE_FILE_NAME);
 
     std::stringstream ss;
-    if (!queue.empty()) {
+    if (!prioqueue.empty()) {
+        ss << "[" << get_offset(QUEUE_FILE_NAME) << "]. " << prioqueue.front();
+        prioqueue.pop();
+    }
+    else if (!queue.empty()) {
         ss << "[" << get_offset(QUEUE_FILE_NAME) << "]. " << queue.front();
         queue.pop();
     }
@@ -38,7 +43,7 @@ std::string get_question(void) {
     }
 
     increment_offset(QUEUE_FILE_NAME);
-    save_queue(queue, QUEUE_FILE_NAME);
+    save_queue(prioqueue, queue, QUEUE_FILE_NAME);
 
     return ss.str();
 }

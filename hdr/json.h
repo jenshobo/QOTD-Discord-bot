@@ -8,8 +8,9 @@
 #include <json.hpp>
 #include <dpp/dpp.h>
 
-void save_queue(const std::queue<std::string>& q, const std::string& filename);
+void save_queue(const std::queue<std::string>& prioqueue, const std::queue<std::string>& queue, const std::string& filename);
 std::queue<std::string> load_queue(const std::string& filename);
+std::queue<std::string> load_prioqueue(const std::string& filename);
 
 uint64_t get_offset(const std::string& filename);
 void increment_offset(const std::string& filename);
