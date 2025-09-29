@@ -35,7 +35,7 @@ The manager app knows a number of commands in order to interface the queue with 
 | Command | Description |
 | - | - |
 | ```/add``` | Add a question to the back of the queue. |
-| ```/addprio```| Add a question to the front of the queue. |
+| ```/addprio```| Add a question to the back of the priority queue. |
 | ```/remove``` | Remove a question BY INDEX. |
 | ```/list``` | List the current queue with index. |
 | ```/help``` | A short explaination about the functionality of the bot. |
@@ -74,13 +74,13 @@ Lastly the bot will need the channel ID of the channel you want it to send the Q
 To install the program you can either use a webbrowser to download and install the required version (lastest is recommended) by going to the [GitHub release page](https://github.com/jenshobo/QOTD-Discord-bot/releases). However it is usually easier to just used the terminal. To download the package, you can use the following command:
 
 ```sh
-wget https://github.com/jenshobo/QOTD-Discord-bot/releases/download/v1.0/QOTD-Discord-bot-1.0.deb
+wget https://github.com/jenshobo/QOTD-Discord-bot/releases/download/v1.0/QOTD-Discord-bot-1.1.deb
 ```
 
 Regardless of download choice, to install the package it is recommened to use a terminal. Ones in the download directory, please use the following command to start the install progress:
 
 ```sh
-dpkg -i QOTD-Discord-bot-1.0.deb
+dpkg -i QOTD-Discord-bot-1.1.deb
 ```
 
 The install progress will ask about the bot token which you generated earlier. the start index, each question is indexed, if your channel hasn't had any QOTD's yet, just put in ```0```. And the channel ID you also fetched earlier.
@@ -90,5 +90,5 @@ After this the bot should be up and running and you can execute the commands in 
 To finish you can remove the ```.deb``` file as it is no longer needed. You can do this by executing the following command:
 
 ```sh
-rm QOTD-Discord-bot-1.0.deb
+rm QOTD-Discord-bot-1.1.deb
 ```
