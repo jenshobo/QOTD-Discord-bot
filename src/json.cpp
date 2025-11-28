@@ -1,5 +1,8 @@
 #include "json.h"
 
+/// <summary>
+/// Update the queues in json in the new state unless stated std::nullopt
+/// </summary>
 void write_queue(
     const std::string& filename,
     std::optional<std::string> default_val = std::nullopt,
@@ -42,10 +45,16 @@ void write_queue(
     file <<j.dump(4);
 }
 
+/// <summary>
+/// Save queue's in new state
+/// </summary>
 void save_queue(const std::queue<std::string>& prioqueue, const std::queue<std::string>& queue, const std::string& filename) {
     write_queue(filename, std::nullopt, std::nullopt, std::nullopt, std::nullopt, prioqueue, queue);
 }
 
+/// <summary>
+/// Get the regualr queue from json
+/// </summary>
 std::queue<std::string> load_queue(const std::string& filename) {
     std::ifstream file(filename);
     nlohmann::json j;
@@ -63,6 +72,9 @@ std::queue<std::string> load_queue(const std::string& filename) {
     return q;
 }
 
+/// <summary>
+/// Get the priority queue from json
+/// </summary>
 std::queue<std::string> load_prioqueue(const std::string& filename) {
     std::ifstream file(filename);
     nlohmann::json j;
@@ -80,6 +92,9 @@ std::queue<std::string> load_prioqueue(const std::string& filename) {
     return q;
 }
 
+/// <summary>
+/// Get current offset from json used as index for questions in queue
+/// </summary>
 uint64_t get_offset(const std::string& filename) {
     std::ifstream file(filename);
     nlohmann::json j;
@@ -94,6 +109,9 @@ uint64_t get_offset(const std::string& filename) {
     return 0;
 }
 
+/// <summary>
+/// Increment offset in json used as question index
+/// </summary>
 void increment_offset(const std::string& filename) {
     std::ifstream file(filename);
     nlohmann::json j;
@@ -114,6 +132,9 @@ void increment_offset(const std::string& filename) {
     write_queue(filename, std::nullopt, std::nullopt, offset);
 }
 
+/// <summary>
+/// Get Discord bot token from json
+/// </summary>
 std::string get_token(const std::string& filename) {
     std::ifstream file(filename);
     nlohmann::json j;
@@ -128,6 +149,9 @@ std::string get_token(const std::string& filename) {
     return "";
 }
 
+/// <summary>
+/// Get QOTD channel id from json
+/// </summary>
 dpp::snowflake get_channel(const std::string& filename) {
     std::ifstream file(filename);
     nlohmann::json j;
@@ -142,6 +166,9 @@ dpp::snowflake get_channel(const std::string& filename) {
     return 0;
 }
 
+/// <summary>
+/// Get default question from json
+/// </summary>
 std::string get_default(const std::string& filename) {
     std::ifstream file(filename);
     nlohmann::json j;

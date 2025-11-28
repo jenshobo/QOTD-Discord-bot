@@ -98,6 +98,9 @@ int main() {
     bot.start(dpp::st_wait);
 }
 
+/// <summary>
+/// Return all items in queue in order with index based of offset
+/// </summary>
 std::stringstream queue_tostring(uint16_t& offset, std::queue<std::string>& queue) {
     std::stringstream ss;
     while (!queue.empty()) {
@@ -108,6 +111,9 @@ std::stringstream queue_tostring(uint16_t& offset, std::queue<std::string>& queu
     return ss;
 }
 
+/// <summary>
+/// Add question to the regular queue
+/// </summary>
 void add_to_queue(std::string& question) {
     auto prioqueue = load_prioqueue(QUEUE_FILE_NAME);
     auto queue = load_queue(QUEUE_FILE_NAME);
@@ -117,6 +123,9 @@ void add_to_queue(std::string& question) {
     save_queue(prioqueue, queue, QUEUE_FILE_NAME);
 }
 
+/// <summary>
+/// Add question to the priotiry queue
+/// </summary>
 void add_to_queue_priority(std::string& question) {
     auto prioqueue = load_prioqueue(QUEUE_FILE_NAME);
     auto queue = load_queue(QUEUE_FILE_NAME);
@@ -126,6 +135,9 @@ void add_to_queue_priority(std::string& question) {
     save_queue(prioqueue, queue, QUEUE_FILE_NAME);
 }
 
+/// <summary>
+/// Remove question from queue at given index
+/// </summary>
 void remove_from_queue(uint16_t index) {
     auto prioqueue = load_prioqueue(QUEUE_FILE_NAME);
     auto queue = load_queue(QUEUE_FILE_NAME);
