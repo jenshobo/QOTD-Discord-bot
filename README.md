@@ -74,7 +74,7 @@ Lastly the bot will need the channel ID of the channel you want it to send the Q
 To install the program you can either use a webbrowser to download and install the required version (lastest is recommended) by going to the [GitHub release page](https://github.com/jenshobo/QOTD-Discord-bot/releases). However it is usually easier to just used the terminal. To download the package, you can use the following command:
 
 ```sh
-wget https://github.com/jenshobo/QOTD-Discord-bot/releases/download/v1.0/QOTD-Discord-bot-1.1.deb
+wget https://github.com/jenshobo/QOTD-Discord-bot/releases/download/v1.1/QOTD-Discord-bot-1.1.deb
 ```
 
 Regardless of download choice, to install the package it is recommened to use a terminal. Ones in the download directory, please use the following command to start the install progress:
