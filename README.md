@@ -53,7 +53,7 @@ In order to succesfully compile these apps the following programs are needed to 
 
 ## install guide
 
-To completely set up the program and bot the progress boils down to two steps: setting up the Discord bot and installing the ```.deb```.
+To completely set up the program and bot the progress boils down to two steps: setting up the Discord bot and compiling the code.
 
 ### setup Discord bot
 
@@ -70,8 +70,6 @@ In Discord you need to give the bot permission to view the channel and send mess
 Lastly the bot will need the channel ID of the channel you want it to send the QOTD to. You can get this by right clicking the channel and press ```copy channel ID```. Save this ID for later as you need to during the install progress for the program.
 
 ### compile guide
-
-If you do not wish to compile the program yourself, you can skip this chapter.
 
 To compile the program you'll need to all listed packages downloaded and/or installed. Furthermore please create a folder called build in the working directory. Then execute the following commands to compile the two programs, these will be saved to the build folder.
 
@@ -99,6 +97,8 @@ Next simply run the manager_app program indefinitively and run the update_app on
 
 ### install program (precompiled)
 
+THIS PROCESS HAS BEEN TEMPORARILY REMOVED, if you want to use .deb, please check back at a later date.
+
 To install the program you can either use a webbrowser to download and install the required version (lastest is recommended) by going to the [GitHub release page](https://github.com/jenshobo/QOTD-Discord-bot/releases). However it is usually easier to just used the terminal. To download the package, you can use the following command:
 
 ```sh
@@ -111,7 +111,7 @@ Regardless of download choice, to install the package it is recommened to use a 
 dpkg -i QOTD-Discord-bot-1.1.deb
 ```
 
-The install progress will ask about the bot token which you generated earlier. the start index, each question is indexed, if your channel hasn't had any QOTD's yet, just put in ```0```. And the channel ID you also fetched earlier.
+The install progress will ask about the bot token which you generated earlier. the start index, each question is indexed, if your channel hasn't had any QOTD's yet, just put in ```1```. And the channel ID you also fetched earlier.
 
 After this the bot should be up and running and you can execute the commands in the allowed channels on Discord.
 
