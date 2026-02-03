@@ -69,7 +69,35 @@ In Discord you need to give the bot permission to view the channel and send mess
 
 Lastly the bot will need the channel ID of the channel you want it to send the QOTD to. You can get this by right clicking the channel and press ```copy channel ID```. Save this ID for later as you need to during the install progress for the program.
 
-### install program
+### compile guide
+
+If you do not wish to compile the program yourself, you can skip this chapter.
+
+To compile the program you'll need to all listed packages downloaded and/or installed. Furthermore please create a folder called build in the working directory. Then execute the following commands to compile the two programs, these will be saved to the build folder.
+
+```sh
+g++ -std=c++17 -Ihdr/queue_update -Ilib -Ihdr -o build/update_app src/queue_update/main.cpp src/json.cpp -ldpp
+g++ -std=c++17 -Ihdr/queue_manager -Ilib -Ihdr -o build/manager_app src/queue_manager/main.cpp src/json.cpp -ldpp
+```
+
+Next you'll need to create a json file in which the queue will be stored among a few other things, this file looks like follows. You'll need to manually add the discord bot token you've generated earier. Offset is just a number used to index all the items in the queue, if you have never done a QOTD in Discord before, leave this as 1. qoft-channel-id is the id of the channel the bot will post all the questions (I just noticed I made a typo in this name, I'll fix it later).
+
+```json
+{
+    "default": "",
+    "discord-bot-token": "",
+    "offset": 1,
+    "qoft-channel-id": 0,
+    "prioqueue": [],
+    "queue": []
+}
+```
+
+This file needs to be saved in the same folder as the two programs, as both programs interact with it. Avoid sharing the contents of this file as the discord-bot-token is considered sensitive information.
+
+Next simply run the manager_app program indefinitively and run the update_app ones a day to see the program in action.
+
+### install program (precompiled)
 
 To install the program you can either use a webbrowser to download and install the required version (lastest is recommended) by going to the [GitHub release page](https://github.com/jenshobo/QOTD-Discord-bot/releases). However it is usually easier to just used the terminal. To download the package, you can use the following command:
 
