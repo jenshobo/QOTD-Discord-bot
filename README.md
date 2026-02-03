@@ -93,7 +93,7 @@ Next you'll need to create a json file in which the queue will be stored among a
 }
 ```
 
-This file needs to be saved in the same folder as the two programs, as both programs interact with it. Avoid sharing the contents of this file as the discord-bot-token is considered sensitive information.
+This file needs to be saved in the same folder as the two programs, as both programs interact with it. The file should be named ```QOTD_queue.json``` Avoid sharing the contents of this file as the discord-bot-token is considered sensitive information.
 
 Next simply run the manager_app program indefinitively and run the update_app ones a day to see the program in action.
 
