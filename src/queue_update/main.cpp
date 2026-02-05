@@ -10,6 +10,18 @@ int main(void) {
     bot.on_log(dpp::utility::cout_logger());
 
     bot.on_ready([&bot](const dpp::ready_t& event) {
+        if (get_queue_length() <= 3) {
+            bot.message_create(dpp::message(get_alert_channel(QUEUE_FILE_NAME), "**[ALERT]**. Queue has less then 3 items in it, check current list using `/list`."),
+                [&bot](const dpp::confirmation_callback_t& callback) {
+                    if (!callback.is_error()) {
+                        std::cout << "Alert sent successfully" << std::endl;
+                    } else {
+                        std::cerr << "Failed to send alert: " << callback.get_error().message << std::endl;
+                    }
+                }
+            );
+        }
+
         std::string question = get_question();
 
         bot.message_create(dpp::message(get_channel(QUEUE_FILE_NAME), question),
@@ -33,6 +45,19 @@ int main(void) {
 }
 
 /// <summary>
+/// Get total length of queue and prioqueue
+/// </summary>
+int get_queue_length(void) {
+    auto prioqueue = load_prioqueue(QUEUE_FILE_NAME);
+    auto queue = load_queue(QUEUE_FILE_NAME);
+
+    int prioqueue_size = prioqueue.size();
+    int queue_size = queue.size();
+
+    return prioqueue_size + queue_size;
+}
+
+/// <summary>
 /// Get next question from current queue json file
 /// Priority order queue:
 /// 1. prioqueue
@@ -45,15 +70,15 @@ std::string get_question(void) {
 
     std::stringstream ss;
     if (!prioqueue.empty()) {
-        ss << "[" << get_offset(QUEUE_FILE_NAME) << "]. " << prioqueue.front();
+        ss << get_offset(QUEUE_FILE_NAME) << ". " << prioqueue.front();
         prioqueue.pop();
     }
     else if (!queue.empty()) {
-        ss << "[" << get_offset(QUEUE_FILE_NAME) << "]. " << queue.front();
+        ss << get_offset(QUEUE_FILE_NAME) << ". " << queue.front();
         queue.pop();
     }
     else {
-        ss << "[" << get_offset(QUEUE_FILE_NAME) << "]. " << get_default(QUEUE_FILE_NAME);
+        ss << get_offset(QUEUE_FILE_NAME) << ". " << get_default(QUEUE_FILE_NAME);
     }
 
     increment_offset(QUEUE_FILE_NAME);

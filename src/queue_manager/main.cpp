@@ -11,18 +11,21 @@ int main() {
             ss
             << "You can add and remove questions to the QOTD (Question Of The Day) queue using the following commands" << std::endl
             << "```" << std::endl
-            << "+----------+-----------------------------------------------+" << std::endl
-            << "| /add     | Add a question to the back of the queue       |" << std::endl
-            << "| /addprio | Add a question to the back of the prioqueue   |" << std::endl
-            << "| /remove  | Remove a question BY INDEX                    |" << std::endl
-            << "| /list    | List the current queue with index             |" << std::endl
-            << "| /help    | You just used this command, don't be dumb now |" << std::endl
-            << "+----------+-----------------------------------------------+" << std::endl
+            << "+----------+-----------------------------------------------------------------+" << std::endl
+            << "| /add     | Add a question to the back of the queue                         |" << std::endl
+            << "| /addprio | Add a question to the back of the prioqueue, requires a user_ID |" << std::endl
+            << "| /remove  | Remove a question BY INDEX                                      |" << std::endl
+            << "| /list    | List the current queue with index                               |" << std::endl
+            << "| /help    | You just used this command, don't be dumb now                   |" << std::endl
+            << "+----------+-----------------------------------------------------------------+" << std::endl
             << "```" << std::endl
+            << "To mention a user you'll need to submit their ID, this can be found by going to their Discord profile, pressing ... (more) and pressing Copy User ID." << std::endl
+            << std::endl
             << "The question at the front of the queue will automatically be posted to the QOTD channel and removed from the queue every day at 12:00." << std::endl
             << "Please make sure the queue is alway filled with items." << std::endl
             << std::endl
-            << "Adding an index to the question is not needed, the program does that automatically." <<std::endl
+            << "Adding an index to the question is not needed, the program does that automatically." << std::endl
+            << "So adding a question like 'Je krijgt 1 wens van een *genie*, wat is je wens? (excl. wensen voor meer wensen)' is formatted perfectly fine." << std::endl
             << "For further questions regarding this software, please contact the software commission." << std::endl;
             event.reply(ss.str());
         }
@@ -38,11 +41,15 @@ int main() {
 
         if (event.command.get_command_name() == "addprio") {
             std::string question_input = std::get<std::string>(event.get_parameter("question"));
+            dpp::snowflake user_id_input = std::get<dpp::snowflake>(event.get_parameter("user_id"));
             std::stringstream ss;
-            ss << "Adding " << question_input << " to the priority queue";
+            ss << "Adding " << question_input << " to the priority queue under the user <@" << user_id_input << ">";
             event.reply(ss.str());
 
-            add_to_queue_priority(question_input);
+            std::stringstream sss;
+            sss << question_input << std::endl << "(ingestuurd door <@" << user_id_input << ">)";
+            std::string s = sss.str();
+            add_to_queue_priority(s);
         }
 
         if (event.command.get_command_name() == "remove") {
@@ -85,6 +92,9 @@ int main() {
                 .add_option(
                     dpp::command_option(dpp::co_string, "question", "The priority question to add", true)
                 )
+                .add_option(
+                    dpp::command_option(dpp::co_user, "user_id", "ID of the user that submitted the question", true)
+                )
             );
             bot.global_command_create(dpp::slashcommand("remove", "Remove item from queue by index (use /list for indexes)", bot.me.id)
                 .add_option(
@@ -104,7 +114,7 @@ int main() {
 std::stringstream queue_tostring(uint16_t& offset, std::queue<std::string>& queue) {
     std::stringstream ss;
     while (!queue.empty()) {
-        ss << "[" << offset << "]. " << queue.front() << std::endl;
+        ss << offset << ". " << queue.front() << std::endl;
         queue.pop();
         offset++;
     }

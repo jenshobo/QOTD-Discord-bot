@@ -7,6 +7,7 @@
 // 1 hour delay, should always be under 24 hours
 #define SHUTDOWN_DELAY (60 * 60)
 
+int get_queue_length(void);
 std::string get_question(void);
 
 #endif

@@ -17,6 +17,7 @@ void increment_offset(const std::string& filename);
 
 std::string get_token(const std::string& filename);
 dpp::snowflake get_channel(const std::string& filename);
+dpp::snowflake get_alert_channel(const std::string& filename);
 std::string get_default(const std::string& filename);
 
 #endif

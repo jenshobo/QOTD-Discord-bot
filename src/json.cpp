@@ -9,6 +9,7 @@ void write_queue(
     std::optional<std::string> bot_token = std::nullopt,
     std::optional<uint64_t> offset = std::nullopt,
     std::optional<dpp::snowflake> channel_id = std::nullopt,
+    std::optional<dpp::snowflake> alert_channel_id = std::nullopt,
     std::optional<std::queue<std::string>> prioqueue = std::nullopt,
     std::optional<std::queue<std::string>> queue = std::nullopt
 ) {
@@ -16,6 +17,7 @@ void write_queue(
     std::string token_field = bot_token.value_or(get_token(filename));
     uint64_t offset_field = offset.value_or(get_offset(filename));
     dpp::snowflake channel_field = channel_id.value_or(get_channel(filename));
+    dpp::snowflake alert_channel_field = alert_channel_id.value_or(get_alert_channel(filename));
     std::queue<std::string> prioqueue_field = prioqueue.value_or(load_prioqueue(filename));
     std::queue<std::string> queue_field = queue.value_or(load_queue(filename));
 
@@ -38,18 +40,19 @@ void write_queue(
     j["discord-bot-token"] = token_field;
     j["offset"] = offset_field;
     j["qotd-channel-id"] = static_cast<uint64_t>(channel_field);
+    j["qotd-alert-channel-id"] = static_cast<uint64_t>(alert_channel_field);
     j["prioqueue"] = prioqueue_vec;
     j["queue"] = queue_vec;
 
     std::ofstream file(filename);
-    file <<j.dump(4);
+    file << j.dump(4);
 }
 
 /// <summary>
 /// Save queue's in new state
 /// </summary>
 void save_queue(const std::queue<std::string>& prioqueue, const std::queue<std::string>& queue, const std::string& filename) {
-    write_queue(filename, std::nullopt, std::nullopt, std::nullopt, std::nullopt, prioqueue, queue);
+    write_queue(filename, std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt, prioqueue, queue);
 }
 
 /// <summary>
@@ -157,6 +160,23 @@ dpp::snowflake get_channel(const std::string& filename) {
     nlohmann::json j;
 
     std::string field_name = "qotd-channel-id";
+    if (file >> j) {
+        if (j.contains(field_name) && j[field_name].is_number_integer()) {
+            return static_cast<dpp::snowflake>(j[field_name].get<uint64_t>());
+        }
+    }
+
+    return 0;
+}
+
+/// <summary>
+/// Get alert channel id from json
+/// </summary>
+dpp::snowflake get_alert_channel(const std::string& filename) {
+    std::ifstream file(filename);
+    nlohmann::json j;
+
+    std::string field_name = "qotd-alert-channel-id";
     if (file >> j) {
         if (j.contains(field_name) && j[field_name].is_number_integer()) {
             return static_cast<dpp::snowflake>(j[field_name].get<uint64_t>());
