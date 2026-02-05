@@ -1,11 +1,27 @@
 #include "main.h"
 
+/// <summary>
+/// Post current question of the day in Discord in channel({qotd-channel-id})
+/// Close program automatically after posting.
+/// </summary>
 int main(void) {
     dpp::cluster bot(get_token(QUEUE_FILE_NAME));
 
     bot.on_log(dpp::utility::cout_logger());
 
     bot.on_ready([&bot](const dpp::ready_t& event) {
+        if (get_queue_length() <= 3) {
+            bot.message_create(dpp::message(get_alert_channel(QUEUE_FILE_NAME), "**[ALERT]**. Queue has less then 3 items in it, check current list using `/list`."),
+                [&bot](const dpp::confirmation_callback_t& callback) {
+                    if (!callback.is_error()) {
+                        std::cout << "Alert sent successfully" << std::endl;
+                    } else {
+                        std::cerr << "Failed to send alert: " << callback.get_error().message << std::endl;
+                    }
+                }
+            );
+        }
+
         std::string question = get_question();
 
         bot.message_create(dpp::message(get_channel(QUEUE_FILE_NAME), question),
@@ -16,6 +32,9 @@ int main(void) {
                     std::cerr << "Failed to send question: " << callback.get_error().message << std::endl;
                 }
 
+                // Keep program running for at least {SHUTDOWN_DELAY} time for shards to finish loading
+                std::this_thread::sleep_for(std::chrono::seconds(SHUTDOWN_DELAY));
+
                 bot.shutdown();
             }
         );
@@ -25,21 +44,41 @@ int main(void) {
     return 0;
 }
 
+/// <summary>
+/// Get total length of queue and prioqueue
+/// </summary>
+int get_queue_length(void) {
+    auto prioqueue = load_prioqueue(QUEUE_FILE_NAME);
+    auto queue = load_queue(QUEUE_FILE_NAME);
+
+    int prioqueue_size = prioqueue.size();
+    int queue_size = queue.size();
+
+    return prioqueue_size + queue_size;
+}
+
+/// <summary>
+/// Get next question from current queue json file
+/// Priority order queue:
+/// 1. prioqueue
+/// 2. queue
+/// 3. default question
+/// </summary>
 std::string get_question(void) {
     auto prioqueue = load_prioqueue(QUEUE_FILE_NAME);
     auto queue = load_queue(QUEUE_FILE_NAME);
 
     std::stringstream ss;
     if (!prioqueue.empty()) {
-        ss << "[" << get_offset(QUEUE_FILE_NAME) << "]. " << prioqueue.front();
+        ss << get_offset(QUEUE_FILE_NAME) << ". " << prioqueue.front();
         prioqueue.pop();
     }
     else if (!queue.empty()) {
-        ss << "[" << get_offset(QUEUE_FILE_NAME) << "]. " << queue.front();
+        ss << get_offset(QUEUE_FILE_NAME) << ". " << queue.front();
         queue.pop();
     }
     else {
-        ss << "[" << get_offset(QUEUE_FILE_NAME) << "]. " << get_default(QUEUE_FILE_NAME);
+        ss << get_offset(QUEUE_FILE_NAME) << ". " << get_default(QUEUE_FILE_NAME);
     }
 
     increment_offset(QUEUE_FILE_NAME);
