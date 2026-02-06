@@ -78,14 +78,15 @@ g++ -std=c++17 -Ihdr/queue_update -Ilib -Ihdr -o build/update_app src/queue_upda
 g++ -std=c++17 -Ihdr/queue_manager -Ilib -Ihdr -o build/manager_app src/queue_manager/main.cpp src/json.cpp -ldpp
 ```
 
-Next you'll need to create a json file in which the queue will be stored among a few other things, this file looks like follows. You'll need to manually add the discord bot token you've generated earier. Offset is just a number used to index all the items in the queue, if you have never done a QOTD in Discord before, leave this as 1. qoft-channel-id is the id of the channel the bot will post all the questions (I just noticed I made a typo in this name, I'll fix it later).
+Next you'll need to create a json file in which the queue will be stored among a few other things, this file looks like follows. You'll need to manually add the discord bot token you've generated earier. Offset is just a number used to index all the items in the queue, if you have never done a QOTD in Discord before, leave this as 1. qoft-channel-id is the id of the channel the bot will post all the questions.
 
 ```json
 {
     "default": "",
     "discord-bot-token": "",
     "offset": 1,
-    "qoft-channel-id": 0,
+    "qotd-channel-id": 0,
+    "qotd-alert-channel-id": 0,
     "prioqueue": [],
     "queue": []
 }
